@@ -18,6 +18,7 @@ import (
 	"knative.dev/func/pkg/ci/github"
 	fn "knative.dev/func/pkg/functions"
 	fnTest "knative.dev/func/pkg/testing"
+	"knative.dev/func/pkg/version"
 )
 
 // START: Integration Tests
@@ -170,6 +171,10 @@ func runConfigCiCmdIntegration(
 	// PRE-RUN PREP
 	// all options for "func config ci" command
 	t.Setenv(fnCmd.ConfigCIFeatureFlag, "true")
+
+	origKver := version.Kver
+	version.Kver = ""
+	t.Cleanup(func() { version.Kver = origKver })
 
 	args := opts.args
 	if len(opts.args) == 0 {
