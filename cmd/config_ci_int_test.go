@@ -18,6 +18,7 @@ import (
 	"knative.dev/func/pkg/ci/github"
 	fn "knative.dev/func/pkg/functions"
 	fnTest "knative.dev/func/pkg/testing"
+	"knative.dev/func/pkg/version"
 )
 
 // START: Integration Tests
@@ -171,6 +172,10 @@ func runConfigCiCmdIntegration(
 	// all options for "func config ci" command
 	t.Setenv(fnCmd.ConfigCIFeatureFlag, "true")
 
+	origKver := version.Kver
+	version.Kver = ""
+	t.Cleanup(func() { version.Kver = origKver })
+
 	args := opts.args
 	if len(opts.args) == 0 {
 		args = []string{"ci"}
@@ -231,7 +236,7 @@ func assertDefaultWorkflow(t *testing.T, actualGw string) {
 
 	assert.Assert(t, yamlContains(actualGw, "Install func cli"))
 	assert.Assert(t, yamlContains(actualGw, "functions-dev/action@main"))
-	assert.Assert(t, yamlContains(actualGw, "version: knative-v1.22.0"))
+	assert.Assert(t, yamlContains(actualGw, "version: "+github.DefaultFuncCliVersion))
 	assert.Assert(t, yamlContains(actualGw, "name: func"))
 
 	assert.Assert(t, yamlContains(actualGw, "Deploy function"))
